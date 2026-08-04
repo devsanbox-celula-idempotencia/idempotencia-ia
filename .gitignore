@@ -1,0 +1,73 @@
+# =============================================================================
+#  SECRETOS — lo más importante de este archivo
+#  El .env lleva la contraseña de SQL Server y el ADMIN_TOKEN en texto plano.
+#  Si se sube una vez, queda en el historial de Git para siempre: no basta con
+#  borrarlo en un commit posterior.
+# =============================================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+secrets/
+
+# ------------------------------------------------------------------ Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Herramientas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+
+# ------------------------------------------------------------------ Editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ------------------------------------------------------------------ Proyecto
+# Bases de datos locales
+*.sqlite3
+*.db
+
+# Logs
+*.log
+logs/
+
+# Artefactos y carpetas temporales
+*.zip
+*.tar.gz
+_to_delete/
+
+# ------------------------------------------------------------------ OJO
+# Lo que SÍ debe subir, por si alguien duda:
+#   .env.example                  plantilla sin secretos
+#   alembic/versions/*.py         las migraciones son código
+#   scripts/sql/*.sql             el esquema es código
+#   Dockerfile, docker-compose*   configuración de despliegue
+#   tests/                        la suite completa

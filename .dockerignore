@@ -1,0 +1,45 @@
+# Sin este archivo, `COPY . .` mete en la imagen el entorno virtual (cientos de
+# MB), el historial de Git y —lo más grave— el .env con la contraseña de la
+# base de datos, que quedaría incrustada en una capa para siempre.
+
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Entornos virtuales y dependencias locales
+.venv/
+venv/
+env/
+node_modules/
+
+# Cachés
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Control de versiones y editores
+.git/
+.gitignore
+.github/
+.idea/
+.vscode/
+*.swp
+
+# Documentación y pruebas: no hacen falta en tiempo de ejecución
+docs/
+tests/
+README.md
+*.md
+!scripts/sql/*.sql
+
+# Artefactos
+*.zip
+_to_delete/
+dist/
+build/

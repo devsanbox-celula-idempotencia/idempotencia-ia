@@ -1,0 +1,94 @@
+# =============================================================================
+#  Entorno de DESARROLLO
+#
+#  Por defecto levanta solo la API, y espera que Ollama y SQL Server ya existan
+#  (en el host o remotos). Los demás servicios son opcionales y se activan con
+#  perfiles, para no arrancar 3 GB de contenedores que quizá no necesitas:
+#
+#     docker compose up -d                              solo la API
+#     docker compose --profile ollama up -d             + Ollama
+#     docker compose --profile sqlserver up -d          + SQL Server local
+#     docker compose --profile redis up -d              + Redis
+#     docker compose --profile ollama --profile redis up -d
+#
+#  Para producción usa docker-compose.prod.yml.
+# =============================================================================
+name: ollama-gateway
+
+services:
+  api:
+    build: .
+    image: ollama-gateway:dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # host.docker.internal apunta a la máquina anfitriona: es como el
+      # contenedor alcanza un Ollama que corre fuera de Docker.
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    ports:
+      # Solo localhost. Publicar "8000:8000" abriría el puerto saltándose ufw.
+      - "127.0.0.1:8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  # --------------------------------------------------------------- opcionales
+  ollama:
+    profiles: ["ollama"]
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_KEEP_ALIVE: "10m"
+    # Tras el primer arranque:
+    #   docker compose exec ollama ollama pull qwen2.5:3b
+    #
+    # Para usar GPU NVIDIA, descomenta:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  redis:
+    profiles: ["redis"]
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --maxmemory 64mb --maxmemory-policy allkeys-lru
+    ports:
+      - "127.0.0.1:6379:6379"
+    mem_limit: 128m
+
+  sqlserver:
+    profiles: ["sqlserver"]
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?define MSSQL_SA_PASSWORD en el .env}
+      MSSQL_PID: "Express"
+      # Sin este límite SQL Server se come toda la RAM disponible y deja a
+      # Ollama sin memoria.
+      MSSQL_MEMORY_LIMIT_MB: "1536"
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    mem_limit: 1800m
+
+volumes:
+  mssql_data:
+  ollama_models:

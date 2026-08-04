@@ -1,0 +1,28 @@
+# Sin versiones exactas a propósito: así pip elige la última versión que tenga
+# wheel precompilado para TU versión de Python y no intenta compilar nada.
+# Instalar con:  pip install --only-binary=:all: -r requirements.txt
+
+# --- API ---
+fastapi>=0.115
+uvicorn[standard]>=0.34
+pydantic>=2.11
+pydantic-settings>=2.7
+
+# --- HTTP hacia Ollama ---
+httpx>=0.28
+
+# --- Persistencia: SQL Server ---
+sqlalchemy[asyncio]>=2.0.36
+aioodbc>=0.5          # driver async (requiere ODBC Driver 18 for SQL Server)
+pyodbc>=5.2           # usado por aioodbc y por Alembic
+
+# --- Rate limiting distribuido (opcional: RATE_LIMIT_BACKEND=redis) ---
+redis>=5.2
+
+# --- Migraciones (opcional: el esquema también está en scripts/sql) ---
+alembic>=1.14
+
+python-dotenv>=1.0
+
+# --- Opcional: conteo local de tokens si el backend no lo reporta ---
+# tiktoken>=0.8
