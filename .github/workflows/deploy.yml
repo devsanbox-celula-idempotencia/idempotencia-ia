@@ -44,14 +44,14 @@ jobs:
         if: always()
         run: docker rm -f ci-test || true
 
+
   deploy:
-    name: CD - Deploy a la VPS
-    needs: ci
     runs-on: ubuntu-latest
     steps:
       - name: Port knocking + Deploy a la VPS
         run: |
           set -e
+
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
@@ -71,6 +71,7 @@ jobs:
             IdentityFile ~/.ssh/deploy_key
             StrictHostKeyChecking no
           EOF
+
 
           echo "[+] Conectando por SSH y desplegando..."
           ssh vps << 'ENDSSH'
