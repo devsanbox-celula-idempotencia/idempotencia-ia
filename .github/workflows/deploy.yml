@@ -59,7 +59,7 @@ jobs:
           echo "[+] Golpeando puertos para abrir acceso..."
           for port in ${{ secrets.KNOCK_PORTS_OPEN }}; do
             timeout 1 bash -c "echo > /dev/tcp/${{ secrets.VPS_HOST }}/$port" 2>/dev/null || true
-            sleep 0.15
+            sleep 0.6
           done
           echo "[+] Puerto 22 abierto temporalmente."
           sleep 2
