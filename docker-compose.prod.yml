@@ -26,9 +26,7 @@ services:
       DEBUG: "false"
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
     ports:
-      # NUNCA "8000:8000": Docker manipula iptables directamente y abriría el
-      # puerto a internet aunque ufw diga lo contrario.
-      - "127.0.0.1:8000:8000"
+      - "100.99.206.50:8000:8000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     mem_limit: 512m
@@ -49,6 +47,12 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    networks:
+      - red-proxy
+
+networks:
+  red-proxy:
+    external: true
 
   # Descomenta si necesitas rate limiting compartido entre varios workers o
   # varias instancias (RATE_LIMIT_BACKEND=redis en el .env).
